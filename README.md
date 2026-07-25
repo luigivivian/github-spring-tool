@@ -59,6 +59,38 @@ The Vite dev server proxies `/api` requests to the backend, so no CORS setup is 
 - **Sign in with GitHub** — optional OAuth2 login; signed-in visitors browse under their own 5,000 req/h quota
 - **Friendly errors** — unknown user, invalid username, rate limit (with retry timing), GitHub down
 
+## Use cases
+
+```mermaid
+flowchart LR
+  anon(["Visitor<br/>(anonymous)"])
+  auth(["Visitor<br/>(signed in)"])
+  gh[("GitHub<br/>REST API")]
+
+  subgraph app["GitHub Repo Browser"]
+    uc1([Search a GitHub user])
+    uc2([Sort / filter the repo list])
+    uc3([Copy clone URL])
+    uc4([View language & activity charts])
+    uc5(["Open repo detail<br/>(README, releases, contributors)"])
+    uc6([Re-run a recent search])
+    uc7([Force-refresh snapshot])
+    uc8([Sign in with GitHub])
+    uc9([See own profile on landing])
+    uc10([Sign out])
+  end
+
+  anon --> uc1 & uc2 & uc3 & uc4 & uc5 & uc6 & uc7
+  anon --> uc8
+  auth -. "everything above,<br/>on a personal 5000 req/h quota" .-> uc1
+  auth --> uc9 & uc10
+  uc1 -->|"cache 10 min"| gh
+  uc4 & uc5 -->|"cache 1 h"| gh
+  uc7 -->|"bypasses cache"| gh
+```
+
+Anonymous visitors share one upstream quota (60 req/h, or 5,000 with `GITHUB_TOKEN`); signing in switches all GitHub calls to the visitor's personal quota. Sorting, filtering and copy actions never touch the network.
+
 ## API
 
 | Endpoint | Description |
