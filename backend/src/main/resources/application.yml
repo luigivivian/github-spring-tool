@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: github-repo-browser
+  config:
+    # picks up the project-root .env automatically (no manual exports needed);
+    # real environment variables still win when both are set
+    import: "optional:file:../.env[.properties]"
+  http:
+    client:
+      connect-timeout: 5s
+      read-timeout: 10s
+  datasource:
+    url: jdbc:h2:file:./data/githubtool
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            # dummy defaults keep the app bootable without credentials; login works once real ones are set
+            client-id: ${GITHUB_CLIENT_ID:dummy-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:dummy-client-secret}
+            scope: read:user
+
+app:
+  github:
+    base-url: https://api.github.com
+    token: ${GITHUB_TOKEN:}
+    cache-ttl: 10m
+  insights:
+    ttl: 1h
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+
+server:
+  port: 8080

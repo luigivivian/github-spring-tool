@@ -1,0 +1,22 @@
+# deps / builds
+node_modules/
+dist/
+target/
+
+# local data
+backend/data/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# temp
+.tmp/
+*.log
+
+# os / editor
+.DS_Store
+.idea/
+*.iml
+.vscode/
